@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
-const cors = require('cors')
-app.use(cors())
+const cors = require('cors');
+app.use(cors());
 
 var morgan = require('morgan');
 app.use(express.json());
-app.use(express.static('build'))
+app.use(express.static('build'));
 app.use(
   morgan(function (tokens, req, res) {
     console.log(req.body);
@@ -30,13 +30,11 @@ app.use(
 //   console.log('---');
 //   next();
 // };
-
 // app.use(requestLogger);
 
 // const unknownEndpoint = (request, response) => {
 //   response.status(404).send({ error: 'unknown endpoint' });
 // };
-
 // app.use(unknownEndpoint);
 
 let notes = [
@@ -158,7 +156,7 @@ app.post('/api/persons', (req, res) => {
   res.json(persons);
 });
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
