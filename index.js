@@ -3,6 +3,44 @@ const app = express();
 const cors = require('cors');
 app.use(cors());
 
+// ------ connetct to mongoDB database  start ------
+const mongoose = require('mongoose');
+if (process.argv.length < 3) {
+  console.log(
+    'Please provide the password as an argument: node mongo.js <password>'
+  );
+  process.exit(1);
+}
+const password = process.argv[2];
+const url = `mongodb+srv://fullstack:${password}@cluster0.pt2ll.mongodb.net/phone-app?retryWrites=true&w=majority`;
+mongoose
+  .connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(() => {
+    console.log('Connected to the Database. Yayzow!');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+const noteSchema = new mongoose.Schema({
+  content: String,
+  date: Date,
+  important: Boolean,
+});
+const Note = mongoose.model('Note', noteSchema);
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+// ------ connetct to mongoDB database end ------
+
 var morgan = require('morgan');
 app.use(express.json());
 app.use(express.static('build'));
@@ -22,20 +60,6 @@ app.use(
     ].join(' ');
   })
 );
-
-// const requestLogger = (request, response, next) => {
-//   console.log('Method:', request.method);
-//   console.log('Path:  ', request.path);
-//   console.log('Body:  ', request.body);
-//   console.log('---');
-//   next();
-// };
-// app.use(requestLogger);
-
-// const unknownEndpoint = (request, response) => {
-//   response.status(404).send({ error: 'unknown endpoint' });
-// };
-// app.use(unknownEndpoint);
 
 let notes = [
   {
@@ -63,17 +87,28 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-  res.json(notes);
+  // res.json(notes);
+  Note.find({}).then((notes) => {
+    console.log('notes', notes);
+    res.json(notes);
+  });
 });
 
 app.get('/api/notes/:id', (req, res) => {
   const id = Number(req.params.id);
-  const note = notes.find((note) => note.id === id);
-  if (note) {
-    res.json(note);
-  } else {
-    res.status(404).end();
-  }
+  Note.find({ id: id }).then((note) => {
+    if (note) {
+      res.json(note);
+    } else {
+      res.status(404).end();
+    }
+  });
+  // const note = notes.find((note) => note.id === id);
+  // if (note) {
+  //   res.json(note);
+  // } else {
+  //   res.status(404).end();
+  // }
 });
 
 app.delete('/api/notes/:id', (req, res) => {
