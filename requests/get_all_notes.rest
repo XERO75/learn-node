@@ -1,5 +1,5 @@
+###
 GET http://localhost:3001/api/notes HTTP/1.1
-
 
 ###
 POST http://localhost:3001/api/notes/ HTTP/1.1
@@ -11,10 +11,25 @@ Content-Type: application/json
 }
 
 ###
+
+
+
+
+
+
+
+
+
+
+
+###
 GET http://localhost:3001/api/persons HTTP/1.1
 
 ###
-GET http://localhost:3001/api/persons/1 HTTP/1.1
+GET http://localhost:3001/info HTTP/1.1
+
+###
+GET http://localhost:3001/api/persons/60506b0c75cf9e11841a257a HTTP/1.1
 
 ###
 DELETE http://localhost:3001/api/persons/2 HTTP/1.1
@@ -22,7 +37,6 @@ DELETE http://localhost:3001/api/persons/2 HTTP/1.1
 ###
 POST http://localhost:3001/api/persons HTTP/1.1
 Content-Type: application/json
-
 {
     "name": "e1123",
     "number": "123"
