@@ -6,44 +6,6 @@ const Note = require('./models/note');
 const Person = require('./models/person');
 app.use(cors());
 
-// ------ connetct to mongoDB database  start ------
-// const mongoose = require('mongoose');
-// if (process.argv.length < 3) {
-//   console.log(
-//     'Please provide the password as an argument: node mongo.js <password>'
-//   );
-//   process.exit(1);
-// }
-// const password = process.argv[2];
-// const url = `mongodb+srv://fullstack:${password}@cluster0.pt2ll.mongodb.net/phone-app?retryWrites=true&w=majority`;
-// mongoose
-//   .connect(url, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     useFindAndModify: false,
-//     useCreateIndex: true,
-//   })
-//   .then(() => {
-//     console.log('Connected to the Database. Yayzow!');
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
-// const noteSchema = new mongoose.Schema({
-//   content: String,
-//   date: Date,
-//   important: Boolean,
-// });
-// const Note = mongoose.model('Note', noteSchema);
-// noteSchema.set('toJSON', {
-//   transform: (document, returnedObject) => {
-//     returnedObject.id = returnedObject._id.toString();
-//     delete returnedObject._id;
-//     delete returnedObject.__v;
-//   },
-// });
-// ------ connetct to mongoDB database end ------
-
 var morgan = require('morgan');
 // const person = require('./models/person');
 app.use(express.json());
@@ -64,12 +26,6 @@ app.use(
     ].join(' ');
   })
 );
-
-// const unknownEndpoint = (request, response) => {
-//   response.status(404).send({ error: 'unknown endpoint' });
-// };
-// // handler of requests with unknown endpoint
-// app.use(unknownEndpoint);
 
 let notes = [
   {
@@ -132,6 +88,7 @@ app.post('/api/notes', (req, res, next) => {
     important: body.important || false,
     data: new Date(),
   });
+
   note
     .save()
     .then((saveNote) => saveNote.toJSON())
@@ -214,7 +171,7 @@ app.delete('/api/persons/:id', (req, res) => {
     .catch((err) => next(err));
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body;
   console.log('body', body);
   if (body.name === undefined) {
@@ -227,9 +184,14 @@ app.post('/api/persons', (req, res) => {
     name: body.name,
     number: body.number,
   });
-  person.save().then((savePerson) => {
-    res.json(savePerson);
-  });
+  person
+    .save()
+    .then((savePerson) => {
+      res.json(savePerson);
+    })
+    .catch((err) => {
+      next(err);
+    });
 
   // let person = req.body;
   // if (!person.name || !person.number) {
