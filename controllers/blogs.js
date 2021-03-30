@@ -11,10 +11,13 @@ const getTokenFrom = (req) => {
   return null;
 };
 
-blogsRouter.get('/', (req, res) => {
-  Blog.find({}).then((notes) => {
-    res.json(notes);
+blogsRouter.get('/', async (req, res) => {
+  const notes = await Blog.find({}).populate('user', {
+    username: 1,
+    name: 1,
+    id: 1,
   });
+  res.json(notes);
 });
 
 blogsRouter.post('/', async (req, res, next) => {
@@ -36,6 +39,7 @@ blogsRouter.post('/', async (req, res, next) => {
 
   const savedBlog = await blog.save();
   user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
   res.json(savedBlog);
 });
 
